@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор видеографа</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="design-tokens.css">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: var(--text-base);
+      line-height: 1.5;
+      letter-spacing: var(--track-normal);
+      padding: var(--space-8);
+      min-height: 100vh;
+    }
+
+    /* ---- Layout ---- */
+    .wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: var(--space-5);
+      align-items: stretch;
+    }
+
+    @media (max-width: 860px) {
+      .wrapper { grid-template-columns: 1fr; }
+      body { padding: var(--space-4); }
+    }
+
+    /* ---- Card ---- */
+    .card {
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* ---- Page header ---- */
+    .page-title {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: var(--track-tight);
+      line-height: 1.1;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+
+    .page-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-8);
+    }
+
+    /* ---- Form label ---- */
+    .field-label {
+      display: block;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-2);
+    }
+
+    /* ---- Two-column row ---- */
+    .fields-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    @media (max-width: 520px) {
+      .fields-row { grid-template-columns: 1fr; }
+    }
+
+    /* ---- Select & Input ---- */
+    select,
+    input[type="number"] {
+      width: 100%;
+      height: 44px;
+      padding: 0 var(--space-4);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-input);
+      background: var(--color-surface);
+      font-family: var(--font);
+      font-size: var(--text-base);
+      font-weight: 400;
+      letter-spacing: var(--track-normal);
+      color: var(--color-text-primary);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b8b8b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 42px;
+      cursor: pointer;
+    }
+
+    select:hover,
+    input[type="number"]:hover {
+      border-color: var(--color-border-strong);
+    }
+
+    select:focus,
+    input[type="number"]:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(0, 126, 255, 0.10);
+    }
+
+    /* ---- Segmented control ---- */
+    .segment-wrap {
+      margin-bottom: var(--space-6);
+    }
+
+    .segmented-control {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f5f5f5;
+      border-radius: var(--radius-button);
+      padding: 4px;
+    }
+
+    .seg-btn {
+      padding: 9px var(--space-4);
+      text-align: center;
+      font-family: var(--font);
+      font-size: var(--text-base);
+      font-weight: 500;
+      letter-spacing: var(--track-normal);
+      color: var(--color-text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .seg-btn.active {
+      background: var(--color-surface);
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-pill);
+    }
+
+    /* ---- Input group ---- */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .input-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Divider ---- */
+    .divider {
+      height: 1px;
+      background: var(--color-border);
+      margin: var(--space-8) 0;
+    }
+
+    /* ---- Result ---- */
+    .result-label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-2);
+    }
+
+    .result-amount {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-6);
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .result-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .result-stat-label {
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: var(--track-loose);
+    }
+
+    .result-stat-value {
+      font-size: var(--text-md);
+      font-weight: 600;
+      letter-spacing: var(--track-tight);
+      color: var(--color-text-primary);
+    }
+
+    /* ---- Service toggle ---- */
+    .service-header {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-cb {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track {
+      flex-shrink: 0;
+      width: 28px;
+      height: 16px;
+      background: var(--color-border-strong);
+      border-radius: 8px;
+      position: relative;
+      transition: background 0.18s ease;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.18s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    }
+
+    .toggle-cb:checked + .toggle-track {
+      background: var(--color-accent);
+    }
+
+    .toggle-cb:checked + .toggle-track::after {
+      transform: translateX(12px);
+    }
+
+    .input-item.is-off input,
+    .input-item.is-off select {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .input-item.is-off .service-header .field-label {
+      color: var(--color-text-tertiary);
+    }
+
+    /* ---- Status badge ---- */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .s-free  { background: var(--color-accent-bg); color: #1a56b0; }
+    .s-free  .status-dot { background: var(--color-accent); }
+    .s-full  { background: #fefce8; color: #854d0e; }
+    .s-full  .status-dot { background: #eab308; }
+    .s-over  { background: #fff7ed; color: #b45309; }
+    .s-over  .status-dot { background: #f97316; }
+    .s-burn  { background: #fef2f2; color: #b91c1c; }
+    .s-burn  .status-dot { background: #ef4444; }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      height: 100%;
+    }
+
+    .sidebar .card:last-child {
+      flex: 1;
+    }
+
+    .section-title {
+      font-size: var(--text-base);
+      font-weight: 600;
+      letter-spacing: var(--track-tight);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-5);
+    }
+
+    /* ---- Price accordion ---- */
+    .price-accordion {
+      max-width: 1100px;
+      margin: var(--space-5) auto 0;
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .price-accordion summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-8);
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .price-accordion summary::-webkit-details-marker { display: none; }
+
+    .price-accordion-title {
+      font-size: var(--text-base);
+      font-weight: 600;
+      letter-spacing: var(--track-tight);
+      color: var(--color-text-primary);
+    }
+
+    .price-accordion-hint {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-left: var(--space-3);
+    }
+
+    .accordion-chevron {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: var(--color-text-tertiary);
+      transition: transform 0.2s ease;
+    }
+
+    .price-accordion[open] .accordion-chevron {
+      transform: rotate(180deg);
+    }
+
+    .price-accordion-body {
+      padding: 0 var(--space-8) var(--space-8);
+    }
+
+    /* ---- Full price table ---- */
+    .price-section {
+      max-width: 1100px;
+      margin: var(--space-5) auto 0;
+    }
+
+    .full-price-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .full-price-table th,
+    .full-price-table td {
+      text-align: right;
+      padding: var(--space-3) var(--space-4);
+      white-space: nowrap;
+      border: 1px solid var(--color-border);
+    }
+
+    .full-price-table th:first-child,
+    .full-price-table td:first-child {
+      text-align: left;
+      border-left: none;
+    }
+
+    .full-price-table th:last-child,
+    .full-price-table td:last-child {
+      border-right: none;
+    }
+
+    .full-price-table .th-level {
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: white;
+      letter-spacing: var(--track-tight);
+      background: var(--color-accent);
+      border-color: rgba(0, 100, 220, 0.25);
+    }
+
+    .full-price-table .th-geo {
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: #252525;
+      text-transform: uppercase;
+      letter-spacing: var(--track-loose);
+      background: #f5f5f5;
+      border-color: var(--color-border);
+    }
+
+    /* Table outer border with rounded corners */
+    .table-wrapper {
+      border: 1.5px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 860px) {
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .full-price-table {
+        min-width: 620px;
+      }
+    }
+
+    .full-price-table thead tr:first-child th {
+      border-top: none;
+    }
+
+    .full-price-table thead tr th:first-child {
+      background: #252525;
+      border-color: #252525;
+    }
+
+    .full-price-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .full-price-table tbody td {
+      font-size: var(--text-sm);
+      font-variant-numeric: tabular-nums;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .full-price-table tbody td:first-child {
+      font-weight: 500;
+      color: #252525;
+      background: #f5f5f5;
+      border-color: var(--color-border);
+    }
+
+    .full-price-table td.is-active {
+      color: var(--color-accent);
+      font-weight: 600;
+      background: var(--color-accent-bg);
+    }
+
+    /* ---- Sidebar price table ---- */
+    .sidebar-price-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .sidebar-price-table th,
+    .sidebar-price-table td {
+      text-align: right;
+      padding: 5px 6px;
+      white-space: nowrap;
+    }
+
+    .sidebar-price-table th:first-child,
+    .sidebar-price-table td:first-child {
+      text-align: left;
+      padding-left: 0;
+    }
+
+    .sidebar-price-table .th-level {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: var(--track-tight);
+      border-bottom: 1.5px solid var(--color-border);
+      padding-bottom: 4px;
+    }
+
+    .sidebar-price-table .th-geo {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding-top: 5px;
+      padding-bottom: 6px;
+    }
+
+    .sidebar-price-table tbody td {
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+    }
+
+    .sidebar-price-table tbody td:first-child {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    .sidebar-price-table td.is-active {
+      color: var(--color-accent);
+      font-weight: 600;
+      background: var(--color-accent-bg);
+    }
+
+    /* ---- Benchmarks accordion ---- */
+    .benchmarks-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: var(--space-5);
+    }
+
+    .benchmarks-summary::-webkit-details-marker { display: none; }
+
+    .benchmarks-chevron {
+      display: none;
+    }
+
+    .benchmarks-body {
+      margin-top: 0;
+    }
+
+    @media (max-width: 860px) {
+      .benchmarks-chevron { display: block; }
+      .benchmarks-summary { margin-bottom: 0; }
+      #benchmarks-details[open] .benchmarks-body { margin-top: var(--space-5); }
+      #benchmarks-details[open] .benchmarks-chevron { transform: rotate(180deg); }
+      .benchmarks-chevron { transition: transform 0.2s ease; }
+    }
+
+    @media (min-width: 861px) {
+      .benchmarks-summary { pointer-events: none; }
+      #benchmarks-details > .benchmarks-body { display: flex !important; }
+    }
+
+    /* ---- Load guides ---- */
+    .load-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .load-item {
+      padding: var(--space-4);
+      border-radius: var(--radius-input);
+      border: 1.5px solid var(--color-border);
+    }
+
+    .load-item-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 3px;
+    }
+
+    .load-item-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-2);
+    }
+
+    .load-item-range {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: var(--track-tight);
+      color: var(--color-text-primary);
+    }
+
+    .load-item.is-accent {
+      background: var(--color-accent-bg);
+      border-color: rgba(0, 126, 255, 0.2);
+    }
+
+    .load-item.is-accent .load-item-range {
+      color: var(--color-accent);
+    }
+
+    /* ---- Bottom CTA block ---- */
+    .bottom-block {
+      max-width: 1100px;
+      margin: var(--space-5) auto 0;
+    }
+
+    .cta-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    .cta-bonus {
+      font-size: var(--text-base);
+      font-weight: 400;
+      color: var(--color-accent);
+      margin-bottom: var(--space-3);
+    }
+
+    .cta-title {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: var(--track-tight);
+      line-height: 1.2;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+    }
+
+    .cta-desc {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-6);
+    }
+
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-accent-bg);
+      color: var(--color-accent);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .step-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    .step-text span {
+      color: var(--color-text-secondary);
+      display: block;
+      font-size: var(--text-xs);
+      margin-top: 1px;
+    }
+
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-input);
+      overflow: hidden;
+      background: #f5f5f5;
+    }
+
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Main card -->
+  <div class="card">
+    <h1 class="page-title">Калькулятор дохода</h1>
+    <p class="page-subtitle">Для видеографов</p>
+
+    <!-- Selects row -->
+    <div class="fields-row">
+      <div>
+        <label class="field-label" for="location">Локация</label>
+        <select id="location" onchange="calculate()">
+          <option value="region">Регионы РФ</option>
+          <option value="capital">Москва / СПб</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label" for="level">Уровень опыта</label>
+        <select id="level" onchange="calculate()">
+          <option value="junior">Junior — только начинаю</option>
+          <option value="middle" selected>Middle — есть портфолио</option>
+          <option value="senior">Senior — высокий чек</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Segmented control -->
+    <div class="segment-wrap">
+      <span class="field-label">Способ оказания услуг</span>
+      <div class="segmented-control">
+        <button id="tab-single" class="seg-btn active" onclick="setMode('single')">Поштучно</button>
+        <button id="tab-package" class="seg-btn" onclick="setMode('package')">Пакетно</button>
+      </div>
+    </div>
+
+    <!-- Single mode -->
+    <div id="single-fields" class="input-group">
+      <div class="input-item" id="item_s_shoots">
+        <label class="service-header">
+          <input type="checkbox" class="toggle-cb" checked onchange="onToggle('item_s_shoots')">
+          <span class="toggle-track"></span>
+          <span class="field-label" style="margin-bottom:0">Съемка, штук в месяц</span>
+        </label>
+        <input type="number" id="s_shoots" value="4" min="0" oninput="calculate()">
+      </div>
+      <div class="input-item" id="item_s_edits">
+        <label class="service-header">
+          <input type="checkbox" class="toggle-cb" checked onchange="onToggle('item_s_edits')">
+          <span class="toggle-track"></span>
+          <span class="field-label" style="margin-bottom:0">Монтаж, роликов в месяц</span>
+        </label>
+        <input type="number" id="s_edits" value="8" min="0" oninput="calculate()">
+      </div>
+      <div class="input-item" id="item_s_scripts">
+        <label class="service-header">
+          <input type="checkbox" class="toggle-cb" checked onchange="onToggle('item_s_scripts')">
+          <span class="toggle-track"></span>
+          <span class="field-label" style="margin-bottom:0">Сценарии, штук в месяц</span>
+        </label>
+        <input type="number" id="s_scripts" value="4" min="0" oninput="calculate()">
+      </div>
+    </div>
+
+    <!-- Package mode -->
+    <div id="package-fields" class="input-group" style="display:none;">
+      <div class="input-item">
+        <label class="field-label" for="p_clients">Количество клиентов</label>
+        <input type="number" id="p_clients" value="1" min="1" oninput="calculate()">
+      </div>
+      <div class="input-item" id="item_p_shoots">
+        <label class="service-header">
+          <input type="checkbox" class="toggle-cb" checked onchange="onToggle('item_p_shoots')">
+          <span class="toggle-track"></span>
+          <span class="field-label" style="margin-bottom:0">Съемка — пакет на клиента</span>
+        </label>
+        <select id="p_shoots" onchange="calculate()">
+          <option value="5">5 роликов — скидка 5%</option>
+          <option value="10" selected>10 роликов — скидка 7%</option>
+          <option value="15">15 роликов — скидка 10%</option>
+          <option value="20">20 роликов — скидка 10%</option>
+          <option value="30">30 роликов — скидка 10%</option>
+        </select>
+      </div>
+      <div class="input-item" id="item_p_edits">
+        <label class="service-header">
+          <input type="checkbox" class="toggle-cb" checked onchange="onToggle('item_p_edits')">
+          <span class="toggle-track"></span>
+          <span class="field-label" style="margin-bottom:0">Монтаж — пакет на клиента</span>
+        </label>
+        <select id="p_edits" onchange="calculate()">
+          <option value="5">5 роликов — скидка 5%</option>
+          <option value="10" selected>10 роликов — скидка 7%</option>
+          <option value="15">15 роликов — скидка 10%</option>
+          <option value="20">20 роликов — скидка 10%</option>
+          <option value="30">30 роликов — скидка 10%</option>
+        </select>
+      </div>
+      <div class="input-item" id="item_p_scripts">
+        <label class="service-header">
+          <input type="checkbox" class="toggle-cb" checked onchange="onToggle('item_p_scripts')">
+          <span class="toggle-track"></span>
+          <span class="field-label" style="margin-bottom:0">Сценарии — пакет на клиента</span>
+        </label>
+        <select id="p_scripts" onchange="calculate()">
+          <option value="5">5 штук — скидка 5%</option>
+          <option value="10" selected>10 штук — скидка 7%</option>
+          <option value="15">15 штук — скидка 10%</option>
+          <option value="20">20 штук — скидка 10%</option>
+          <option value="30">30 штук — скидка 10%</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="divider"></div>
+    <div class="result-label">Доход в месяц</div>
+    <div class="result-amount"><span id="total_res">0</span> ₽</div>
+    <div class="result-row">
+      <div class="result-stat">
+        <span class="result-stat-label">Нагрузка</span>
+        <span class="result-stat-value"><span id="hours_res">0</span> ч / нед</span>
+      </div>
+      <div id="stress_lvl"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <div class="card benchmarks-card" id="benchmarks-card">
+      <details id="benchmarks-details">
+        <summary class="benchmarks-summary">
+          <span class="section-title" style="margin-bottom:0">Ориентиры нагрузки</span>
+          <svg class="accordion-chevron benchmarks-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </summary>
+        <div class="load-list benchmarks-body">
+          <div class="load-item">
+            <div class="load-item-title">Комфортный режим</div>
+            <div class="load-item-desc">8–12 роликов + монтаж в месяц, 1–2 клиента</div>
+            <div class="load-item-range">80 000 — 120 000 ₽</div>
+          </div>
+          <div class="load-item is-accent">
+            <div class="load-item-title">Плотный график</div>
+            <div class="load-item-desc">15–20 единиц контента, 2–3 клиента</div>
+            <div class="load-item-range">150 000 — 220 000 ₽</div>
+          </div>
+          <div class="load-item">
+            <div class="load-item-title">Масштаб</div>
+            <div class="load-item-desc">20+ роликов или пакеты от 3 клиентов</div>
+            <div class="load-item-range">300 000 ₽ и выше</div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Price accordion -->
+<details class="price-accordion">
+  <summary>
+    <span>
+      <span class="price-accordion-title">Рыночные ставки — Reels</span>
+      <span class="price-accordion-hint">нажмите, чтобы раскрыть</span>
+    </span>
+    <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </summary>
+  <div class="price-accordion-body">
+    <div class="table-wrapper">
+    <table class="full-price-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th colspan="2" class="th-level">Junior</th>
+          <th colspan="2" class="th-level">Middle</th>
+          <th colspan="2" class="th-level">Senior</th>
+        </tr>
+        <tr>
+          <th></th>
+          <th class="th-geo">Регионы</th>
+          <th class="th-geo">Мск/СПб</th>
+          <th class="th-geo">Регионы</th>
+          <th class="th-geo">Мск/СПб</th>
+          <th class="th-geo">Регионы</th>
+          <th class="th-geo">Мск/СПб</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Съемка</td>
+          <td data-col="junior">1 500–3 000 ₽</td>
+          <td data-col="junior">3 000–5 000 ₽</td>
+          <td data-col="middle">3 500–6 000 ₽</td>
+          <td data-col="middle">6 000–12 000 ₽</td>
+          <td data-col="senior">8 000–15 000 ₽</td>
+          <td data-col="senior">14 000–25 000 ₽</td>
+        </tr>
+        <tr>
+          <td>Монтаж</td>
+          <td data-col="junior">800–1 500 ₽</td>
+          <td data-col="junior">1 200–2 500 ₽</td>
+          <td data-col="middle">2 000–4 500 ₽</td>
+          <td data-col="middle">3 500–8 000 ₽</td>
+          <td data-col="senior">5 000–9 000 ₽</td>
+          <td data-col="senior">9 000–16 000 ₽</td>
+        </tr>
+        <tr>
+          <td>Сценарий</td>
+          <td data-col="junior">500–1 000 ₽</td>
+          <td data-col="junior">800–1 500 ₽</td>
+          <td data-col="middle">1 500–2 500 ₽</td>
+          <td data-col="middle">2 500–4 500 ₽</td>
+          <td data-col="senior">3 000–5 000 ₽</td>
+          <td data-col="senior">5 000–9 000 ₽</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</details>
+
+<!-- Bottom CTA block -->
+<div class="bottom-block">
+  <div class="cta-card">
+    <div style="text-align: center;">
+      <p class="cta-bonus">И у меня для тебя бонус</p>
+      <h2 class="cta-title">Пошаговый план: как видеографу выйти<br>на доход от 100 000 руб/мес</h2>
+      <p class="cta-desc">Внутри мой 7-летний опыт, упакованный в 4 конкретные шага — от базы в съемке до стабильного потока клиентов.</p>
+    </div>
+    <div class="video-wrap">
+      <iframe
+        src="https://www.youtube.com/embed/NISyGBXIeds?si=vv4mjSbfLnTmcDoy"
+        title="Как видеографу выйти на доход от 100 000 руб/мес"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  const data = {
+    junior: { s: 2250,  e: 1150, sc: 750,  mul: 1.8 },
+    middle: { s: 4750,  e: 3250, sc: 2000, mul: 1.9 },
+    senior: { s: 11500, e: 7000, sc: 4000, mul: 1.7 }
+  };
+
+  let currentMode = 'single';
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('tab-single').classList.toggle('active', mode === 'single');
+    document.getElementById('tab-package').classList.toggle('active', mode === 'package');
+    document.getElementById('single-fields').style.display = mode === 'single' ? 'flex' : 'none';
+    document.getElementById('package-fields').style.display = mode === 'package' ? 'flex' : 'none';
+    calculate();
+  }
+
+  function onToggle(itemId) {
+    const item = document.getElementById(itemId);
+    const cb = item.querySelector('.toggle-cb');
+    item.classList.toggle('is-off', !cb.checked);
+    calculate();
+  }
+
+  function isOn(itemId) {
+    const item = document.getElementById(itemId);
+    return item ? !item.classList.contains('is-off') : true;
+  }
+
+  function getDiscount(val) {
+    const n = parseInt(val);
+    if (n >= 15) return 0.10;
+    if (n >= 10) return 0.07;
+    if (n >= 5)  return 0.05;
+    return 0;
+  }
+
+  function fmt(n) {
+    return Math.round(n).toLocaleString('ru-RU');
+  }
+
+  function calculate() {
+    const lv  = document.getElementById('level').value;
+    const loc = document.getElementById('location').value;
+    const base = data[lv];
+    const mul  = (loc === 'capital') ? base.mul : 1;
+
+    const priceS  = base.s  * mul;
+    const priceE  = base.e  * mul;
+    const priceSc = base.sc * mul;
+
+    // Highlight active level column in price tables
+    document.querySelectorAll('.full-price-table [data-col]').forEach(td => {
+      td.classList.toggle('is-active', td.dataset.col === lv);
+    });
+
+    let totalIncome = 0;
+    let totalHours  = 0;
+
+    if (currentMode === 'single') {
+      const nS  = isOn('item_s_shoots') ? (parseInt(document.getElementById('s_shoots').value)  || 0) : 0;
+      const nE  = isOn('item_s_edits')  ? (parseInt(document.getElementById('s_edits').value)   || 0) : 0;
+      const nSc = isOn('item_s_scripts')? (parseInt(document.getElementById('s_scripts').value) || 0) : 0;
+
+      totalIncome = (nS * priceS) + (nE * priceE) + (nSc * priceSc);
+      totalHours  = (nS * 4) + (nE * 3) + (nSc * 1.5);
+    } else {
+      const nC  = parseInt(document.getElementById('p_clients').value) || 0;
+      const pS  = isOn('item_p_shoots') ? parseInt(document.getElementById('p_shoots').value) : 0;
+      const pE  = isOn('item_p_edits')  ? parseInt(document.getElementById('p_edits').value)  : 0;
+      const pSc = isOn('item_p_scripts')? parseInt(document.getElementById('p_scripts').value) : 0;
+
+      const costS  = pS  ? (pS  * priceS)  * (1 - getDiscount(pS))  : 0;
+      const costE  = pE  ? (pE  * priceE)  * (1 - getDiscount(pE))  : 0;
+      const costSc = pSc ? (pSc * priceSc) * (1 - getDiscount(pSc)) : 0;
+
+      totalIncome = (costS + costE + costSc) * nC;
+      totalHours  = ((pS * 3) + (pE * 2.5) + (pSc * 1)) * nC;
+    }
+
+    const weeklyHours = Math.round(totalHours / 4.3);
+
+    document.getElementById('total_res').innerText = fmt(totalIncome);
+    document.getElementById('hours_res').innerText = weeklyHours;
+
+    const el = document.getElementById('stress_lvl');
+    if (weeklyHours <= 15) {
+      el.innerHTML = `<span class="status-badge s-free"><span class="status-dot"></span>Свободный график</span>`;
+    } else if (weeklyHours <= 40) {
+      el.innerHTML = `<span class="status-badge s-full"><span class="status-dot"></span>Полная занятость</span>`;
+    } else if (weeklyHours <= 55) {
+      el.innerHTML = `<span class="status-badge s-over"><span class="status-dot"></span>Переработки</span>`;
+    } else {
+      el.innerHTML = `<span class="status-badge s-burn"><span class="status-dot"></span>Риск выгорания</span>`;
+    }
+  }
+
+  calculate();
+
+  // Benchmarks: open on desktop, collapsible on mobile
+  const benchmarksDetails = document.getElementById('benchmarks-details');
+  function syncBenchmarks() {
+    if (window.innerWidth >= 861) {
+      benchmarksDetails.setAttribute('open', '');
+    } else if (!benchmarksDetails.dataset.userToggled) {
+      benchmarksDetails.removeAttribute('open');
+    }
+  }
+  benchmarksDetails.addEventListener('toggle', () => {
+    if (window.innerWidth < 861) benchmarksDetails.dataset.userToggled = '1';
+  });
+  syncBenchmarks();
+  window.addEventListener('resize', syncBenchmarks);
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+/* ============================================
+   Design Tokens — Калькулятор видеографа
+   ============================================ */
+
+:root {
+  /* --- Colors --- */
+  --color-bg:               #f5f5f5;
+  --color-surface:          #ffffff;
+  --color-text-primary:     #252525;
+  --color-text-secondary:   #8a8a8a;
+  --color-text-tertiary:    #b8b8b8;
+  --color-accent:           #007EFF;
+  --color-accent-bg:        #eff6ff;
+  --color-border:           #ebebeb;
+  --color-border-strong:    #d0d0d0;
+
+  /* --- Border Radius --- */
+  --radius-card:     25px;
+  --radius-button:   15px;
+  --radius-input:    12px;
+  --radius-badge:    8px;
+  --radius-pill:     100px;
+
+  /* --- Spacing Scale --- */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+
+  /* --- Typography --- */
+  --font:           'Inter', system-ui, -apple-system, sans-serif;
+  --track-tight:    -0.03em;
+  --track-normal:   -0.015em;
+  --track-loose:    0.04em;
+
+  /* Font sizes */
+  --text-xs:    11px;
+  --text-sm:    13px;
+  --text-base:  15px;
+  --text-md:    17px;
+  --text-lg:    20px;
+  --text-xl:    24px;
+  --text-2xl:   32px;
+
+  /* --- Shadows --- */
+  --shadow-card:    0 2px 16px rgba(0, 0, 0, 0.05);
+  --shadow-lifted:  0 4px 24px rgba(0, 0, 0, 0.07);
+  --shadow-pill:    0 1px 4px rgba(0, 0, 0, 0.08);
+}
